@@ -1,0 +1,14 @@
+fid = fopen('blurred_wiener.dat','r','ieee-le');
+data = fread(fid,[256,Inf],'float32');
+fclose(fid);
+blurred_img = data(:,1:256);
+psf = data(:,257:512);
+figure(1), imagesc(blurred_img); title('blurred image');colormap(gray);
+Gout = fftshift(fft2(ifftshift(blurred_img)));
+H = fftshift(fft2(ifftshift(psf)));
+ccH = conj(H);
+SNR = 10000000;
+W = (ccH)./(abs(ccH).*abs(H) + (1/SNR));
+Gin = Gout.*W;
+gin = fftshift(ifft2(ifftshift(Gin)));
+figure(2), imagesc(real(gin)); title('weiner filtered image'); axis image; colormap(gray);
